@@ -6,49 +6,89 @@
 <MyLayout>:
     orientation:'vertical'
     padding:(36,36)
+    id:bl
+    Button:
+        text:'Buildozer在线打包工具(点我有惊喜)'
+        size_hint:1,0.4
+        background_normal:'4.png'
+        on_release:popup.open()
+    Popup:
+        id:popup
+        title:'惊喜'
+        on_parent:
+            if self.parent==bl:self.parent.remove_widget(self)
+        BoxLayout:
+            orientation:'vertical'
+            MDLabel:
+                id:label
+                font_size:35
+                color:1,1,1,1
+                text: '1. 路径填写kivy项目路径, 主程序必须为main.py\n\n2. app名称必须为英文, 不然会打包失败\n\n3. 覆盖通知栏参数为True或False\n\n4. 注意包名的格式是xxx.xxx.xxx\n\n5. python版本可以为python2或python3, py3仅支持纯py库\n\n6. 屏幕方向参数对应坚屏横屏自动:portrait,landscape,all\n\n7. 若想自定义图标, icon.png放在项目路径下即可\n'
+            Label:
     Label:
-        text:'Buildozer在线打包工具'
-        
-    MDTextField:
-        id:pyver
-        hint_text:'python版本(2 or 3)'
-        text:'python2'
+        size_hint_y:0.15
     MDTextField:
         id:project
+        size_hint_y:0.4
         hint_text:'项目路径'
         text:'/sdcard/qpython/projects/KivySample'
-    MDTextField:
-        id:title
-        hint_text:'title(只能英文)'    
-        text:'My Application'
-    MDTextField:
-        id:name
-        hint_text:'package.name'  
-        text:'myapp'  
-    MDTextField:
-        id:domain
-        hint_text:'package.domain'  
-        text:'org.test'
-    MDTextField:
-        id:version
-        hint_text:'version'    
-        text:'0.1'
+    BoxLayout:
+        orientation:'horizontal'  
+        size_hint:1,0.4   
+        MDTextField:
+            id:title
+            hint_text:'app名称'
+            text:'My Application'        
+        MDTextField:
+            id:fullscreen
+            hint_text:'覆盖通知栏'
+            text:'False'
+       
+    BoxLayout:
+        orientation:'horizontal'
+        size_hint:1,0.4
+        MDTextField:
+            id:package
+            hint_text:'app包名'
+            text:'org.test.myapp'        
+        MDTextField:
+            id:version
+            hint_text:'app版本'    
+            text:'0.1'
+            
+    BoxLayout:
+        orientation:'horizontal' 
+        size_hint:1,0.4       
+        MDTextField:
+            id:pyver
+            hint_text:'python版本'  
+            text:'python2'                
+        MDTextField:
+            id:orientation
+            hint_text:'屏幕方向'    
+            text:'portrait'
+              
     MDTextField:
         id:requirements
-        hint_text:'requirements'
+        size_hint_y:0.4
+        hint_text:'第三方库'
         text:'kivy' if pyver.text=='python2' else 'python3crystax,kivy'
     MDTextField:
         id:permissions
-        hint_text:'android.permissions'
+        size_hint_y:0.4
+        hint_text:'app权限'
+        text:'INTERNET,WRITE_EXTERNAL_STORAGE'
     MDTextField:
         id:email
-        hint_text:'email(接收apk)'
+        size_hint_y:0.4
+        hint_text:'邮箱'
     MDRaisedButton:
         id:button
-        text:'打包'
-        size_hint:1,1
+        text:'请输入邮箱' if email.text=='' else '提交打包任务'
+        size_hint:1,0.4
         on_release:
             root.start()
+    
         
     
     

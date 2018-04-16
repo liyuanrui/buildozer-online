@@ -1,5 +1,6 @@
 #coding=utf-8
 #qpy:kivy
+#qpy:fullscreen
 
 import kivy
 kivy.require('1.10.0')
@@ -21,15 +22,18 @@ class MyLayout(BoxLayout):
         pyver = self.ids.pyver.text
         project0 = self.ids.project.text
         title = self.ids.title.text
-        name = self.ids.name.text
-        domain = self.ids.domain.text
+        fullscreen = self.ids.fullscreen.text
+        package = self.ids.package.text.split('.')
+        name = package[-1]
+        domain = '.'.join(package[:-1])
         version = self.ids.version.text
+        orientation = self.ids.orientation.text
         requirements = self.ids.requirements.text
         permissions = self.ids.permissions.text
         email = self.ids.email.text
         
         if email == '':
-            self.ids.button.text='打包(请输入邮箱)'
+            self.ids.button.text='请输入邮箱'
             return 1
         if self.sign:
             self.ids.button.text='已提交任务,如有新任务请重启app'
@@ -48,10 +52,10 @@ class MyLayout(BoxLayout):
         #exit()
         c = rpyc.connect('111.230.24.37',30033)
         
-        c.root.start(pyver,project,dirs,title,name,domain,version,requirements,permissions,email)
+        pcount = c.root.start(pyver,project,dirs,title,name,domain,version,requirements,permissions,email,fullscreen,orientation)
         c.close()
         self.sign=True
-        self.ids.button.text='打包中，请留意邮件'
+        self.ids.button.text='队列位置:%s, 预计等待%s分钟'%(pcount,pcount*15)
         
 
 class MainApp(App):
