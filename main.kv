@@ -1,0 +1,54 @@
+#: import MDTextField kivymd.textfields.MDTextField
+#: import MDRaisedButton kivymd.button.MDRaisedButton
+#: import MDLabel kivymd.label.MDLabel
+
+
+<MyLayout>:
+    orientation:'vertical'
+    padding:(36,36)
+    Label:
+        text:'Buildozer在线打包工具'
+        
+    MDTextField:
+        id:pyver
+        hint_text:'python版本(2 or 3)'
+        text:'python2'
+    MDTextField:
+        id:project
+        hint_text:'项目路径'
+        text:'/sdcard/qpython/projects/KivySample'
+    MDTextField:
+        id:title
+        hint_text:'title(只能英文)'    
+        text:'My Application'
+    MDTextField:
+        id:name
+        hint_text:'package.name'  
+        text:'myapp'  
+    MDTextField:
+        id:domain
+        hint_text:'package.domain'  
+        text:'org.test'
+    MDTextField:
+        id:version
+        hint_text:'version'    
+        text:'0.1'
+    MDTextField:
+        id:requirements
+        hint_text:'requirements'
+        text:'kivy' if pyver.text=='python2' else 'python3crystax,kivy'
+    MDTextField:
+        id:permissions
+        hint_text:'android.permissions'
+    MDTextField:
+        id:email
+        hint_text:'email(接收apk)'
+    MDRaisedButton:
+        id:button
+        text:'打包'
+        size_hint:1,1
+        on_release:
+            root.start()
+        
+    
+    
