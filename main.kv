@@ -23,7 +23,7 @@
                 id:label
                 font_size:35
                 color:1,1,1,1
-                text: '1. 路径填写kivy项目路径, 主程序必须为main.py\n\n2. app名称必须为英文, 不然会打包失败\n\n3. 覆盖通知栏参数为True或False\n\n4. 注意包名的格式是xxx.xxx.xxx\n\n5. python版本可以为python2或python3, py3仅支持纯py库\n\n6. 屏幕方向参数对应坚屏横屏自动:portrait,landscape,all\n\n7. 若想自定义图标, icon.png放在项目路径下即可\n'
+                text: '1. 路径填写kivy项目路径, 主程序必须为main.py\n\n2. app名称必须为英文, 不然会打包失败\n\n3. 覆盖通知栏参数为True或False\n\n4. 注意包名的格式是xxx.xxx.xxx\n\n5. python版本可以为python2或python3, py3仅支持纯py库\n\n6. 屏幕方向参数对应坚屏横屏自动:portrait,landscape,all\n\n7. 若想自定义图标, icon.png放在项目路径下即可\n\n8. 欢迎到https://github.com/liyuanrui/buildozer-online 提issue'
             Label:
     Label:
         size_hint_y:0.15
@@ -84,7 +84,8 @@
         hint_text:'邮箱'
     MDRaisedButton:
         id:button
-        text:'请输入邮箱' if email.text=='' else '提交打包任务'
+        text:
+            '提交打包任务'
         size_hint:1,0.4
         on_release:
             root.start()
