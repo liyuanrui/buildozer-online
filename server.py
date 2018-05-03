@@ -104,8 +104,14 @@ def init_buildozer(uid,pyver,title,name,domain,version,requirements,permissions,
     if permissions:
         oread[87] = 'android.permissions = '+encode(permissions)
 
-    if os.path.exists('icon.png'):
+    if os.path.exists('%spresplash.png'%filepath):
+        oread[48] = 'presplash.filename = '+home+'/'+uid+'/presplash.png'
+
+    if os.path.exists('%sicon.png'%filepath):
         oread[51] = 'icon.filename = '+home+'/'+uid+'/icon.png'
+
+    if 'WAKE_LOCK' in permissions:
+        oread[169] = 'android.wakelock = True'
 
     nr = '\n'.join(oread)
     with open('%sbuildozer.spec'%filepath,'w') as f:f.write(nr)
