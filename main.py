@@ -3,7 +3,7 @@
 #qpy:fullscreen
 
 import kivy
-kivy.require('1.10.0')
+
 
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -73,13 +73,14 @@ class MyLayout(BoxLayout):
                 with open(fname,'rb') as f:
                     project[fname]=f.read()
         
-        #exit()
+        S.action=True
+        self.ids.button.text='上传中...'
         c = rpyc.connect('111.230.24.37',30033)
         
         pcount = c.root.start(pyver,project,dirs,title,name,domain,version,requirements,permissions,email,fullscreen,orientation)
         c.close()
-        S.action=True
-        self.ids.button.text='队列位置:%s, 预计等待%s分钟'%(pcount,pcount*15)
+        
+        self.ids.button.text='队列位置:%s, 预计等待%s分钟'%(pcount,pcount*3)
         
 
 class MainApp(App):
@@ -159,7 +160,6 @@ class MainApp(App):
             pyver.hint_text='python版本'
             S.a8=True
 
-
             
         if S.a1&S.a2&S.a3&S.a4&S.a5&S.a6&S.a7&S.a8:
             button.text='提交打包任务'
@@ -167,5 +167,5 @@ class MainApp(App):
             button.text='输入有误，请检查非法参数'
     
     def on_start(self):
-        Clock.schedule_interval(self.checkinput,0)
+        Clock.schedule_interval(self.checkinput,1)
 MainApp().run()
