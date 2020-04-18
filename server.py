@@ -53,41 +53,16 @@ def sendmail(To,filename):
 def run(task):
     uid,pyver,email = task
     filepath=home+'/'+uid+'/'
-
-    os.system('cp -a /home/pi/test/.buildozer %s'%filepath)
+    # 共用packages和python-for-android, 巧妙的映射
+    os.makedirs(filepath+'.buildozer/android/platform/build-'+pyver)
+    os.system('ln -s /home/pi/packages '+filepath+'.buildozer/android/platform/build-'+pyver+'/packages')
+    os.system('ln -s /home/pi/python-for-android '+filepath+'.buildozer/android/platform/python-for-android')
 
     try:
         os.system('cd %s &&buildozer android debug >build.log'%filepath) 
         apk = [i for i in os.listdir(filepath+'bin') if i[-3:]=='apk']
         if apk:
             sendmail(email, filepath+'bin/'+apk[0])
-            # copy sucessful recipe
-            buildlist = [i for i in os.listdir(filepath+'.buildozer/android/platform') if i[:5] == 'build']
-            for i in buildlist:
-                current_i = filepath + '.buildozer/android/platform/' + i
-                release_i = '/home/pi/test/.buildozer/android/platform/' + i
-                # copy other_builds
-                current_other = current_i+'/build/other_builds/'
-                release_other = release_i+'/build/other_builds/'
-                if not os.path.exists(release_other):
-                    os.makedirs(release_other)
-                current_other_list = os.listdir(current_other)
-                release_other_list = os.listdir(release_other)
-                for o in current_other_list:
-                    if not o in release_other_list:
-                        print('copy other_build %s'%o)
-                        os.system('cp -a %s %s'%(current_other+o, release_other))
-                # copy packages
-                current_package = current_i+'/packages/'
-                release_package = release_i+'/packages/'
-                if not os.path.exists(release_package):
-                    os.makedirs(release_package)
-                current_package_list = os.listdir(current_package)
-                release_package_list = os.listdir(release_package)
-                for p in current_package_list:
-                    if not p in release_package_list:
-                        print('copy package %s'%p)
-                        os.system('cp -a %s %s'%(current_package+p, release_package))
         else:
             sendmail(email, filepath+'build.log')
     except Exception as e:
@@ -95,6 +70,7 @@ def run(task):
         sendmail(email, filepath+'build.log')
     finally:
         os.system('rm -rf ' + filepath)
+        os.system('rm -rf /home/pi/python-for-android/*.apk')
 
 
 def build():
