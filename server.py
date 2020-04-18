@@ -5,6 +5,9 @@ import os
 import time
 import threading
 import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.header import Header
 
 
 home = '/home/kivydev/buildenv'
@@ -23,17 +26,37 @@ def encode(string):
 class Sign:
     plist = []
 
-def sendmail(email,filename=None):
-    smtp=smtplib.SMTP()
-    smtp.connect('smtp.exmail.qq.com')
-    smtp.login('cv@lr.cool','rpyc8023RPYC')
-    message = 'From:cv@lr.cool\nTo:%s\nSubject:Buildozer APK\n\n'%email
-    if filename:
-        message+='build successful.download it.\n http://111.230.24.37:30044/?filename=%s'%filename[0]
+def sendmail(To,filename):
+    #构建邮件头
+    message = MIMEMultipart()
+    message['From'] = Header("Buildozer Online", 'utf-8')
+    message['To'] =  Header(To, 'utf-8')
+    message['Subject'] = Header('Buildozer Online', 'utf-8')
+ 
+    #邮件正文内容
+    if filename[-3:] == 'apk':
+        content='恭喜! 打包成功, 请查收附件'
     else:
-        message+='build failed, please check requirements.'
-    smtp.sendmail('cv@lr.cool', email, message)
-    smtp.quit()
+        content='抱歉! 打包失败, 请检查日志'
+    message.attach(MIMEText(content, 'plain', 'utf-8'))
+
+    # 构造附件
+    att1 = MIMEText(open(filename, 'rb').read(), 'base64', 'utf-8')
+    att1["Content-Type"] = 'application/octet-stream'
+    att1["Content-Disposition"] = 'attachment; filename="%s"'%filename.split('/')[-1]
+    message.attach(att1)
+
+    # 发送邮件
+    try:
+        smtpObj = smtplib.SMTP()
+        smtpObj.connect('smtp.exmail.qq.com')
+        smtpObj.login('cv@lr.cool', 'xxxxxxxxxx')
+        smtpObj.sendmail('qpython@lr.cool', To, message.as_string())
+        print("邮件发送成功")
+    except Exception as e:
+        print("邮件发送失败: %s"%e)
+    else:
+        smtpObj.quit()
 
 def run(nl):
     uid,pyver,email = nl
