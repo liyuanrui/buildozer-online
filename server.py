@@ -61,25 +61,47 @@ def sendmail(To,filename):
 def run(nl):
     uid,pyver,email = nl
     filepath=home+'/'+uid+'/'
-    if pyver == 'python2':
-        os.system('cp -a /home/kivydev/buildozer-py2/.buildozer %s'%filepath)
-    else:
-        os.system('cp -a /home/kivydev/buildozer-py3/.buildozer %s'%filepath)
+
+    os.system('cp -a /home/pi/test/.buildozer %s'%filepath)
 
     try:
-        os.system('cd %s && buildozer android debug'%filepath) 
+        os.system('cd %s &&buildozer android debug >build.log'%filepath) 
+        apk = [i for i in os.listdir('bin') if i[-3:]=='apk']
+        if apk:
+            sendmail(email, filepath+'bin'+apk[0])
+            # copy sucessful recipe
+            buildlist = [i for i in os.listdir('.buildozer/android/platform') if i[:5] == 'build']
+            for i in buildlist:
+                current_i = filepath + '.buildozer/android/platform/' + i
+                release_i = '/home/pi/test/.buildozer/android/platform/' + i
+                # copy other_builds
+                current_other = current_i+'/build/other_builds/'
+                release_other = release_i+'/build/other_builds/'
+                if not os.path.exists(release_other):
+                    os.makedirs(release_other)
+                current_other_list = os.listdir(current_other)
+                release_other_list = os.listdir(release_other)
+                for o in current_other_list:
+                    if not o in release_other_list:
+                        print('copy other_build %s'%o)
+                        os.system('cp -a %s %s'%(current_other+o, release_other))
+                # copy packages
+                current_package = current_i+'/packages/'
+                release_package = release_i+'/packages/'
+                if not os.path.exists(release_package):
+                    os.makedirs(release_package)
+                current_package_list = os.listdir(current_package)
+                release_package_list = os.listdir(release_package)
+                for p in current_package_list:
+                    if not p in release_package_list:
+                        print('copy package %s'%p)
+                        os.system('cp -a %s %s'%(current_package+p, release_package))
+        else:
+            sendmail(email, filepath+'build.log')
     except:
-        os.system('rm -rf '+home+'/'+uid)
-
-    try:
-        sf = [j for i in os.walk('%sbin'%filepath) for j in i[2]]
-        os.system('cp %sbin/%s /home/kivydev/apks/%s-%s'%(filepath,sf[0],uid[:20],sf[0]))
-        sf[0]=uid[:20]+'-'+sf[0]
-    except:
-        sendmail(email)
-    else:
-        sendmail(email,sf)
-    os.system('rm -rf '+home+'/'+uid)
+        sendmail(email, filepath+'build.log')
+    finally:
+        os.system('rm -rf ' + filepath)
 
 def build():
     while True:
