@@ -58,8 +58,8 @@ def sendmail(To,filename):
     else:
         smtpObj.quit()
 
-def run(nl):
-    uid,pyver,email = nl
+def run(task):
+    uid,pyver,email = task
     filepath=home+'/'+uid+'/'
 
     os.system('cp -a /home/pi/test/.buildozer %s'%filepath)
@@ -107,23 +107,23 @@ def build():
     while True:
         time.sleep(30)
         try:
-            nl = Sign.plist.pop(0)
-            print(nl)
-            run(nl)
+            task = Sign.plist.pop(0)
+            print(task)
+            run(task)
         except Exception as e:
             ctime=time.ctime()[11:19]
             print(ctime,e)
 
 def write_project(project,dirs):
-    uiid=uuid.uuid1().hex
-    filepath=home+'/'+uiid+'/'
+    uid=uuid.uuid1().hex
+    filepath=home+'/'+uid+'/'
     os.mkdir(filepath)
     for i in dirs:
         os.makedirs(filepath+i)
     for name in project:
         with open(filepath+name,'wb') as f:
             f.write(project[name])
-    return uiid
+    return uid
 
 def init_buildozer(uid,pyver,title,name,domain,version,requirements,permissions,fullscreen,orientation):
     filepath=home+'/'+uid+'/'
@@ -166,9 +166,9 @@ def init_buildozer(uid,pyver,title,name,domain,version,requirements,permissions,
     
 class Build(Service):
     def exposed_start(self,pyver,project,dirs,title,name,domain,version,requirements,permissions,email,fullscreen,orientation):
-        uiid = write_project(project,dirs)
-        init_buildozer(uiid,pyver,title,name,domain,version,requirements,permissions,fullscreen,orientation)
-        Sign.plist.append([uiid,pyver,email])
+        uid = write_project(project,dirs)
+        init_buildozer(uid,pyver,title,name,domain,version,requirements,permissions,fullscreen,orientation)
+        Sign.plist.append([uid,pyver,email])
         pcmd = os.popen('ls /home/kivydev/buildenv').read().split('\n')[:-1]
         pcount = len(pcmd)
         return pcount
