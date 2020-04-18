@@ -14,19 +14,11 @@ home = '/home/kivydev/buildenv'
 if not os.path.exists(home):
     os.mkdir(home)
 
-
-def encode(string):
-    try:
-        string=string.encode('utf-8')
-    except:
-        string=string
-    finally:
-        return string
-
 class Sign:
     plist = []
 
 def sendmail(To,filename):
+    print(filename)
     #构建邮件头
     message = MIMEMultipart()
     message['From'] = Header("Buildozer Online", 'utf-8')
@@ -50,7 +42,7 @@ def sendmail(To,filename):
     try:
         smtpObj = smtplib.SMTP()
         smtpObj.connect('smtp.exmail.qq.com')
-        smtpObj.login('cv@lr.cool', 'xxxxxxxxxx')
+        smtpObj.login('qpython@lr.cool', 'rpyc8023RPYC')
         smtpObj.sendmail('qpython@lr.cool', To, message.as_string())
         print("邮件发送成功")
     except Exception as e:
@@ -66,11 +58,11 @@ def run(task):
 
     try:
         os.system('cd %s &&buildozer android debug >build.log'%filepath) 
-        apk = [i for i in os.listdir('bin') if i[-3:]=='apk']
+        apk = [i for i in os.listdir(filepath+'bin') if i[-3:]=='apk']
         if apk:
-            sendmail(email, filepath+'bin'+apk[0])
+            sendmail(email, filepath+'bin/'+apk[0])
             # copy sucessful recipe
-            buildlist = [i for i in os.listdir('.buildozer/android/platform') if i[:5] == 'build']
+            buildlist = [i for i in os.listdir(filepath+'.buildozer/android/platform') if i[:5] == 'build']
             for i in buildlist:
                 current_i = filepath + '.buildozer/android/platform/' + i
                 release_i = '/home/pi/test/.buildozer/android/platform/' + i
@@ -98,10 +90,12 @@ def run(task):
                         os.system('cp -a %s %s'%(current_package+p, release_package))
         else:
             sendmail(email, filepath+'build.log')
-    except:
+    except Exception as e:
+        traceback.print_exc()
         sendmail(email, filepath+'build.log')
     finally:
         os.system('rm -rf ' + filepath)
+
 
 def build():
     while True:
@@ -127,19 +121,16 @@ def write_project(project,dirs):
 
 def init_buildozer(uid,pyver,title,name,domain,version,requirements,permissions,fullscreen,orientation):
     filepath=home+'/'+uid+'/'
-    if pyver == 'python2':
-        os.system('cp /home/kivydev/buildozer-py2/buildozer.spec %s'%filepath)
-    else:
-        os.system('cp /home/kivydev/buildozer-py3/buildozer.spec %s'%filepath)
+    os.system('cp /home/kivydev/buildozer-py3/buildozer.spec %s'%filepath)
     with open('%sbuildozer.spec'%filepath,'r') as f:
         oread = f.read().strip().split('\n')
 
-    oread[3] = 'title = '+encode(title)
-    oread[6] = 'package.name = '+encode(name)
-    oread[9] = 'package.domain = '+encode(domain)
-    oread[30] = 'version = '+encode(version)
-    oread[38] = 'requirements = '+encode(requirements)
-    oread[54] = 'orientation = '+encode(orientation)
+    oread[3] = 'title = '+title
+    oread[6] = 'package.name = '+name
+    oread[9] = 'package.domain = '+domain
+    oread[30] = 'version = '+version
+    oread[38] = 'requirements = '+requirements
+    oread[54] = 'orientation = '+orientation
 
     if eval(fullscreen):
         oread[77] = 'fullscreen = 1'
@@ -147,7 +138,7 @@ def init_buildozer(uid,pyver,title,name,domain,version,requirements,permissions,
         oread[77] = 'fullscreen = 0'
 
     if permissions:
-        oread[87] = 'android.permissions = '+encode(permissions)
+        oread[87] = 'android.permissions = '+permissions
 
     if os.path.exists('%spresplash.png'%filepath):
         oread[48] = 'presplash.filename = '+home+'/'+uid+'/presplash.png'
