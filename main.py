@@ -5,9 +5,8 @@
 import kivy
 
 
-from kivy.app import App
+from kivymd.app import MDApp
 from kivy.uix.boxlayout import BoxLayout
-from kivymd.theming import ThemeManager
 from kivy.core.text import LabelBase
 from kivy.core.window import WindowBase
 from kivy.clock import Clock
@@ -76,17 +75,17 @@ class MyLayout(BoxLayout):
         S.action=True
         self.ids.button.text='上传中...'
         c = rpyc.connect('111.230.24.37',30033)
-        
+        c._config['sync_request_timeout'] = 600
         pcount = c.root.start(pyver,project,dirs,title,name,domain,version,requirements,permissions,email,fullscreen,orientation)
         c.close()
         
-        self.ids.button.text='队列位置:%s, 预计等待%s分钟'%(pcount,pcount*3)
+        self.ids.button.text='队列位置:%s, 预计等待%s分钟'%(pcount,pcount*30)
         
 
-class MainApp(App):
-    theme_cls = ThemeManager()
+class MainApp(MDApp):
+
     def build(self):
-        self.theme_cls.theme_style = 'Dark'
+        #self.theme_cls.theme_style = 'Dark'
         return MyLayout()
         
     def checkinput(self,nap):
@@ -108,42 +107,42 @@ class MainApp(App):
             project.hint_text='非法参数(路径或main.py不存在)'
             S.a1=False
         else:
-            project.hint_text='项目路径'                  
+            project.hint_text='项目路径(包含main.py)'                  
             S.a1=True
         # a2
         if not ('@' in email.text and '.' in email.text):
             email.hint_text='非法参数(请输入邮箱)'
             S.a2=False
         else:
-            email.hint_text='邮箱'
+            email.hint_text='接收邮箱'
             S.a2=True
         # a3
         if checkcn(title.text) or title.text=='':
             title.hint_text='非法参数(只能英文)'
             S.a3=False
         else:
-            title.hint_text='app名称'
+            title.hint_text='app名称(只能英文)'
             S.a3=True
         #a4
         if not fullscreen.text in ('True','False'):
             fullscreen.hint_text='非法参数(True or False)'
             S.a4=False
         else:
-            fullscreen.hint_text='覆盖通知栏'
+            fullscreen.hint_text='覆盖通知栏(True, False)'
             S.a4=True
         #a5
         if not (len(package.text.split('.'))==3 and package.text.split('.')[-1]!=''):
-            package.hint_text='非法参数(x.y.z)'
+            package.hint_text='非法参数(test.org.app)'
             S.a5=False
         else:
-            package.hint_text='app包名'
+            package.hint_text='app包名(test.org.app)'
             S.a5=True
         #a6
         if not orientation.text in ('portrait','landscape','all'):
-            orientation.hint_text='非法参数'
+            orientation.hint_text='非法参数(portrait,landscape)'
             S.a6=False
         else:
-            orientation.hint_text='屏幕方向'
+            orientation.hint_text='屏幕方向(portrait,landscape)'
             S.a6=True
         #a7
         if version.text=='':
@@ -157,7 +156,7 @@ class MainApp(App):
             pyver.hint_text='非法参数'
             S.a8=False
         else:
-            pyver.hint_text='python版本'
+            pyver.hint_text='编译版本'
             S.a8=True
 
             
