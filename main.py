@@ -12,6 +12,7 @@ from kivy.core.window import WindowBase
 from kivy.clock import Clock
 import rpyc
 import os
+import webbrowser
 
 WindowBase.softinput_mode='below_target'
 LabelBase.register(name='Roboto',fn_regular='droid.ttf')
@@ -40,6 +41,8 @@ def checkcn(string):
     return False
 
 class MyLayout(BoxLayout):
+    def github(self):
+        webbrowser.open('https://github.com/liyuanrui/buildozer-online')
     
     def start(self):
         pyver = self.ids.pyver.text
